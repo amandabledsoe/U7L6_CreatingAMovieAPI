@@ -73,6 +73,46 @@ namespace U7L6.Controllers
         }
 
         [Route("RandomMoviePicks")]
+        public ApiResponse<List<Movies>> GetRandomMoviePicks(int quantity)
+        {
+            List<Movies> moviesPicks = new List<Movies>();
+            int randNumLimit = _MoviesDB.Movies.Count() + 1;
+            var apiResponse = new ApiResponse<List<Movies>>();
 
+            apiResponse.succeeded = false;
+
+            if (quantity<=_MoviesDB.Movies.Count() && quantity>0)
+            {
+                for (int i = 0; i < quantity + 1; i++)
+                {
+                    if (moviesPicks.Count < i)
+                    {
+                        Random random = new Random();
+                        int randomNumber = random.Next(randNumLimit);
+
+                        foreach (var movie in _MoviesDB.Movies)
+                        {
+                            if (!moviesPicks.Contains(movie) && movie.ID == randomNumber)
+                            {
+                                moviesPicks.Add(movie);
+                                break;
+                            }
+                            else
+                            {
+                                i--;
+                            }
+                        }
+                    }
+                }
+                apiResponse.data = moviesPicks;
+                apiResponse.succeeded = true;
+            }
+            else
+            {
+                apiResponse.errorMessage = "This number is outside the range amount of movies in the database";
+                apiResponse.errorCode = 42;
+            }
+            return apiResponse;
+        }
     }
 }
